@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build-node-modules": "browserify -r backbone -r react > public/node-modules.js",
+    "build-requirements": "browserify -r backbone -r react > public/requirements.js",
     "build-bundle": "browserify -x backbone -x react src/use-node-modules.js > public/bundle.js",
     "start": "http-server",
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -24,7 +24,10 @@
     "babelify": "^5.0.3",
     "browserify": "^9.0.3",
     "gulp": "^3.8.11",
-    "http-server": "^0.7.5"
+    "gulp-rename": "^1.2.0",
+    "http-server": "^0.7.5",
+    "vinyl-source-stream": "^1.0.0",
+    "vinyl-transform": "^1.0.0"
   },
   "dependencies": {
     "backbone": "^1.1.2",
