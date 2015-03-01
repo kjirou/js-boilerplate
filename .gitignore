@@ -36,4 +36,5 @@ testem.*.*.*.json
 
 
 build/*.js
+public/*.js
 .envrc
