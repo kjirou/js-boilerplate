@@ -11,21 +11,21 @@ var jsRequirements = [
   'react'
 ];
 
-var bundleES6 = function bundleES6() {
-  return transform(function(fileName) {
-    return browserify(fileName, {
-        debug: true
-      })
-      .transform(babelify)
-      .require()
-      .bundle()
-      .on('error', function(err){
-        console.error(err.message);
-        this.emit('end');
-      })
-    ;
-  });
-}
+//var bundleES6 = function bundleES6() {
+//  return transform(function(fileName) {
+//    return browserify(fileName, {
+//        debug: true
+//      })
+//      .transform(babelify)
+//      .require()
+//      .bundle()
+//      .on('error', function(err){
+//        console.error(err.message);
+//        this.emit('end');
+//      })
+//    ;
+//  });
+//}
 
 gulp.task('build-js-simple', function() {
   return browserify('./src/use-requirements.js', {
@@ -53,6 +53,21 @@ gulp.task('build-js-only-app', function() {
       debug: true
     })
     .external(jsRequirements)
+    .bundle()
+    .pipe(vinylSourceStream('bundle.js'))
+    .pipe(gulp.dest('./public'))
+  ;
+});
+
+gulp.task('build-es6-simple', function() {
+  return browserify('./es6/index.es6', {
+      debug: true,
+      extensions: ['.es6']
+    })
+    .transform(babelify)
+    //.transform(babelify.configure({
+    //  extensions: ['.es6']
+    //}))
     .bundle()
     .pipe(vinylSourceStream('bundle.js'))
     .pipe(gulp.dest('./public'))
