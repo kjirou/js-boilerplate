@@ -48,7 +48,7 @@ gulp.task('build-js-requirements', function() {
   ;
 });
 
-gulp.task('build-js-only-app', function() {
+gulp.task('build-js-app', function() {
   return browserify('./src/use-requirements.js', {
       debug: true
     })
@@ -65,9 +65,19 @@ gulp.task('build-es6-simple', function() {
       extensions: ['.es6']
     })
     .transform(babelify)
-    //.transform(babelify.configure({
-    //  extensions: ['.es6']
-    //}))
+    .bundle()
+    .pipe(vinylSourceStream('bundle.js'))
+    .pipe(gulp.dest('./public'))
+  ;
+});
+
+gulp.task('build-es6-app', function() {
+  return browserify('./es6/index.es6', {
+      debug: true,
+      extensions: ['.es6']
+    })
+    .transform(babelify)
+    .external(jsRequirements)
     .bundle()
     .pipe(vinylSourceStream('bundle.js'))
     .pipe(gulp.dest('./public'))
