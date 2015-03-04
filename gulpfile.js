@@ -28,7 +28,7 @@ var jsRequirements = [
 //}
 
 gulp.task('build-js-simple', function() {
-  return browserify('./src/use-requirements.js', {
+  return browserify('./js/use-requirements.js', {
       debug: true
     })
     .bundle()
@@ -49,7 +49,7 @@ gulp.task('build-js-requirements', function() {
 });
 
 gulp.task('build-js-app', function() {
-  return browserify('./src/use-requirements.js', {
+  return browserify('./js/index.js', {
       debug: true
     })
     .external(jsRequirements)

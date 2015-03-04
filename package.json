@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "build-requirements": "browserify -r backbone -r react > public/requirements.js",
-    "build-bundle": "browserify -x backbone -x react src/use-node-modules.js > public/bundle.js",
+    "build-bundle": "browserify -x backbone -x react js/index.js > public/bundle.js",
     "start": "http-server",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
