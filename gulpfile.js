@@ -6,9 +6,13 @@ var vinylTransform  = require('vinyl-transform');
 var vinylSourceStream  = require('vinyl-source-stream');
 
 
-var jsRequirements = [
+var JS_REQUIREMENTS = [
   'backbone',
   'react'
+];
+
+var WATCHED_ES6_SOURCES = [
+  './es6/**/*.es6'
 ];
 
 //var bundleES6 = function bundleES6() {
@@ -41,7 +45,7 @@ gulp.task('build-js-requirements', function() {
   return browserify({
       debug: true
     })
-    .require(jsRequirements)
+    .require(JS_REQUIREMENTS)
     .bundle()
     .pipe(vinylSourceStream('requirements.js'))
     .pipe(gulp.dest('./public'))
@@ -52,7 +56,7 @@ gulp.task('build-js-app', function() {
   return browserify('./js/index.js', {
       debug: true
     })
-    .external(jsRequirements)
+    .external(JS_REQUIREMENTS)
     .bundle()
     .pipe(vinylSourceStream('bundle.js'))
     .pipe(gulp.dest('./public'))
@@ -77,9 +81,15 @@ gulp.task('build-es6-app', function() {
       extensions: ['.es6']
     })
     .transform(babelify)
-    .external(jsRequirements)
+    .external(JS_REQUIREMENTS)
     .bundle()
     .pipe(vinylSourceStream('bundle.js'))
     .pipe(gulp.dest('./public'))
   ;
+});
+
+gulp.task('watch-es6', function() {
+  gulp.watch(WATCHED_ES6_SOURCES, function() {
+    gulp.start('build-es6-app');
+  });
 });
