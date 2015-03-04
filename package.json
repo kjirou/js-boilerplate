@@ -1,5 +1,5 @@
 {
-  "name": "browserify-sandbox",
+  "name": "build-system-sandbox",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
