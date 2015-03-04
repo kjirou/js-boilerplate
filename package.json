@@ -24,7 +24,8 @@
     "babelify": "^5.0.3",
     "browserify": "^9.0.3",
     "gulp": "^3.8.11",
-    "gulp-rename": "^1.2.0",
+    "gulp-plumber": "0.6.6",
+    "gulp-rename": "1.2.0",
     "http-server": "^0.7.5",
     "vinyl-source-stream": "^1.0.0",
     "vinyl-transform": "^1.0.0"

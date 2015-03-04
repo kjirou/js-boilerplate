@@ -1,6 +1,7 @@
 var babelify = require('babelify');
 var browserify = require('browserify');
 var gulp = require('gulp');
+var gulpPlumber = require('gulp-plumber');
 var gulpRename = require('gulp-rename');
 var vinylTransform  = require('vinyl-transform');
 var vinylSourceStream  = require('vinyl-source-stream');
@@ -30,6 +31,12 @@ var WATCHED_ES6_SOURCES = [
 //    ;
 //  });
 //}
+
+var onError = function onError(err) {
+  console.error(err.stack || err);
+  this.emit('end');
+};
+
 
 gulp.task('build-js-simple', function() {
   return browserify('./js/use-requirements.js', {
@@ -83,6 +90,10 @@ gulp.task('build-es6-app', function() {
     .transform(babelify)
     .external(JS_REQUIREMENTS)
     .bundle()
+    // これで標準エラー処理を書き換えているので、コンパイル時にエラーに成っても終了しない
+    // watch が落ちないのはいいけど、build が正常終了になる
+    // 今のところ、同じようなタスクを2つ作って、片方はonError外すという方法しか不明
+    .on('error', onError)
     .pipe(vinylSourceStream('bundle.js'))
     .pipe(gulp.dest('./public'))
   ;
@@ -90,6 +101,6 @@ gulp.task('build-es6-app', function() {
 
 gulp.task('watch-es6', function() {
   gulp.watch(WATCHED_ES6_SOURCES, function() {
-    gulp.start('build-es6-app');
+    return gulp.start('build-es6-app');
   });
 });
