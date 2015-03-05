@@ -3,6 +3,7 @@ var browserify = require('browserify');
 var gulp = require('gulp');
 var gulpPlumber = require('gulp-plumber');
 var gulpRename = require('gulp-rename');
+var gulpStylus = require('gulp-stylus');
 var vinylTransform  = require('vinyl-transform');
 var vinylSourceStream  = require('vinyl-source-stream');
 
@@ -103,4 +104,18 @@ gulp.task('watch-es6', function() {
   gulp.watch(WATCHED_ES6_SOURCES, function() {
     return gulp.start('build-es6-app');
   });
+});
+
+gulp.task('build-stylus', function() {
+  // ちなみに stylus の @import はファイルが無くても例外を吐かないので
+  // @require の方が良い
+  gulp.src('./stylus/index.styl')
+    .pipe(gulpStylus({
+      // stylus 内で import or require しないで css 上だけで事前に読み込みたい場合
+      // import: ['nib'],
+      // TODO: lineno 効いてない気がする
+      lineno: true
+    }))
+    .pipe(gulpRename('styles.css'))
+    .pipe(gulp.dest('./public'));
 });

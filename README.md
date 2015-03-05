@@ -19,6 +19,7 @@
   - 凝って複雑にしているのであまり参考にならない
 - [Gulp is awesome, but do we really need it?](http://gon.to/2015/02/26/gulp-is-awesome-but-do-we-really-need-it/)
   - gulp 使わない例
+- https://github.com/stevelacy/gulp-stylus
 
 ### ES6
 - [ECMAScript 6 modules: the final syntax](http://www.2ality.com/2014/09/es6-modules-final.html)

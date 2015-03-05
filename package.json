@@ -26,7 +26,9 @@
     "gulp": "^3.8.11",
     "gulp-plumber": "0.6.6",
     "gulp-rename": "1.2.0",
+    "gulp-stylus": "^2.0.1",
     "http-server": "^0.7.5",
+    "stylus": "^0.50.0",
     "vinyl-source-stream": "^1.0.0",
     "vinyl-transform": "^1.0.0"
   },
