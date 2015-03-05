@@ -85,6 +85,8 @@ gulp.task('build-es6-simple', function() {
 
 gulp.task('build-es6-app', function() {
   return browserify('./es6/index.es6', {
+      // true で source map を付与する
+      // 他の効果があるのかは未調査
       debug: true,
       extensions: ['.es6']
     })
