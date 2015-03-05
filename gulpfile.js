@@ -32,7 +32,7 @@ var WATCHED_ES6_SOURCES = [
 //  });
 //}
 
-var onError = function onError(err) {
+var onIgnoreError = function onIgnoreError(err) {
   console.error(err.stack || err);
   this.emit('end');
 };
@@ -92,8 +92,8 @@ gulp.task('build-es6-app', function() {
     .bundle()
     // これで標準エラー処理を書き換えているので、コンパイル時にエラーに成っても終了しない
     // watch が落ちないのはいいけど、build が正常終了になる
-    // 今のところ、同じようなタスクを2つ作って、片方はonError外すという方法しか不明
-    .on('error', onError)
+    // 今のところ、同じようなタスクを2つ作って、片方は外すという方法しか不明
+    .on('error', onIgnoreError)
     .pipe(vinylSourceStream('bundle.js'))
     .pipe(gulp.dest('./public'))
   ;
