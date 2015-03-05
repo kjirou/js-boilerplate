@@ -4,6 +4,7 @@ var gulp = require('gulp');
 var gulpPlumber = require('gulp-plumber');
 var gulpRename = require('gulp-rename');
 var gulpStylus = require('gulp-stylus');
+var notifier = require('node-notifier');
 var vinylTransform  = require('vinyl-transform');
 var vinylSourceStream  = require('vinyl-source-stream');
 
@@ -34,7 +35,13 @@ var WATCHED_ES6_SOURCES = [
 //}
 
 var onIgnoreError = function onIgnoreError(err) {
+  console.log(this);
   console.error(err.stack || err);
+  notifier.notify({
+    message: err.message,
+    title: 'Compile Error'
+    // sound: 'Glass'
+  });
   this.emit('end');
 };
 

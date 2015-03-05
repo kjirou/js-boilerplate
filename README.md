@@ -20,6 +20,8 @@
 - [Gulp is awesome, but do we really need it?](http://gon.to/2015/02/26/gulp-is-awesome-but-do-we-really-need-it/)
   - gulp 使わない例
 - https://github.com/stevelacy/gulp-stylus
+- [gulpタスク実行中にエラーが出たらデスクトップ通知を出す](http://qiita.com/nakajmg/items/8add9c58ea28a8f31eed)
+  - gulp-notify, node-notifier with plumber
 
 ### ES6
 - [ECMAScript 6 modules: the final syntax](http://www.2ality.com/2014/09/es6-modules-final.html)
