@@ -7,4 +7,8 @@ export class Person {
   fullname() {
     return this.name;
   }
+
+  static getStaticProp() {
+    return 1;
+  }
 }
