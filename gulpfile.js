@@ -110,12 +110,25 @@ gulp.task('build-stylus', function() {
   // ちなみに stylus の @import はファイルが無くても例外を吐かないので
   // @require の方が良い
   gulp.src('./stylus/index.styl')
+    // オプションの仕様は、一部の gulp-stylus 用のものを除いて stylus.render に渡される
+    //
+    // gulp-stylus options)
+    // https://github.com/stevelacy/gulp-stylus/blob/master/index.js
+    //
+    // stylus.render options)
+    // http://learnboost.github.io/stylus/docs/js.html
+    //
     .pipe(gulpStylus({
       // stylus 内で import or require しないで css 上だけで事前に読み込みたい場合
       // import: ['nib'],
       // TODO: lineno 効いてない気がする
       lineno: true
     }))
+    // デフォルトで成功しても何も出力しない（特に watch 時には gulp 出力もないので何もでない）
+    // ので、不安ならこういう感じのを入れる
+    .on('data', function() {
+      console.log(new Date().toString() + ': Compiled stylus');
+    })
     .pipe(gulpRename('styles.css'))
     .pipe(gulp.dest('./public'));
 });
