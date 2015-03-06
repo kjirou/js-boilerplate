@@ -24,6 +24,7 @@
   - gulp-notify, node-notifier with plumber
 
 ### ES6
+- [Overview of ECMAScript 6 features](https://github.com/lukehoban/es6features)
 - [ECMAScript 6 modules: the final syntax](http://www.2ality.com/2014/09/es6-modules-final.html)
   - `export`, `import` に関する仕様
 - [ES6 Coding Style](https://github.com/elierotenberg/coding-styles/blob/master/es6.md)
