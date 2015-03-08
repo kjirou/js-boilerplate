@@ -6,10 +6,17 @@ console.log(Backbone.toString());
 console.log(React.toString());
 
 
-// browserify が動かないケースをメモ
-// 下のコメントアウト部分は、コンパイルは通るが実行時に
+//
+// browserify のたぶんバグの再現
+//
+// 下のコードは正常に動くが
+// 最初の false ブロック内の require を削除すると
 // Cannot find module './required-data'
 // のエラーになる
-console.log(require('./required-data'));
-//var dataPath = './required-data';
-//console.log(require(dataPath));
+//
+if (false) {
+  require('./required-data');
+} else {
+  var dataPath = './required-data';
+  console.log(require(dataPath));
+}
