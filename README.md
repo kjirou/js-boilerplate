@@ -29,7 +29,3 @@
   - `export`, `import` に関する仕様
 - [CoffeeScript vs. ECMAScript 6](https://speakerdeck.com/polarblau/coffeescript-vs-ecmascript-6)
 - [ES6 Coding Style](https://github.com/elierotenberg/coding-styles/blob/master/es6.md)
-
-### Tips
-- browserify のパスは package.json の main ディレクティブを参照する
-  - https://github.com/substack/node-browserify#packagejson
