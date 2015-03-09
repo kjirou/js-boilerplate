@@ -13,12 +13,14 @@ console.log(React.toString());
 // 最初の false ブロック内の require を削除すると、
 // 実行時に Cannot find module './required-data' のエラーになる
 //
-// これはそもそも限られたファイルを事前に結合する仕様上、
-// 明示されていないパスのソースは読み込まない、たぶん仕様。
+// これは限られたファイルを事前に結合する browserify の仕様上、
+// 明示されていないパスのソースは読み込めない
 //
-// https://github.com/substack/node-browserify/issues/883
+// Ref) https://github.com/substack/node-browserify/issues/883
 //
 // どちらかというと、これがそれを解決するハックっぽい
+//
+// !! 同じファイル内に書かないと意味が無かった !!
 //
 if (false) {
   require('./required-data');
