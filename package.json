@@ -28,6 +28,7 @@
     "gulp-rename": "1.2.0",
     "gulp-stylus": "^2.0.1",
     "http-server": "^0.7.5",
+    "licensify": "^1.4.0",
     "node-notifier": "^4.1.2",
     "stylus": "^0.50.0",
     "vinyl-source-stream": "^1.0.0",

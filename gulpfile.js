@@ -4,6 +4,7 @@ var gulp = require('gulp');
 var gulpPlumber = require('gulp-plumber');
 var gulpRename = require('gulp-rename');
 var gulpStylus = require('gulp-stylus');
+var licensify = require('licensify');
 var notifier = require('node-notifier');
 var vinylTransform  = require('vinyl-transform');
 var vinylSourceStream  = require('vinyl-source-stream');
@@ -61,6 +62,7 @@ gulp.task('build-js-requirements', function() {
       debug: true
     })
     .require(JS_REQUIREMENTS)
+    .plugin(licensify)
     .bundle()
     .pipe(vinylSourceStream('requirements.js'))
     .pipe(gulp.dest('./public'))
