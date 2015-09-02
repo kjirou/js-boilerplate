@@ -1,0 +1,14 @@
+:root {
+  // Main theme color
+  --color: red;
+}
+
+div {
+  #foo {
+    color: var(--color);
+  }
+}
+
+a {
+  display: flex;
+}

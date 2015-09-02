@@ -2,10 +2,12 @@ var babelify = require('babelify');
 var browserify = require('browserify');
 var gulp = require('gulp');
 var gulpPlumber = require('gulp-plumber');
+var gulpPostcss = require('gulp-postcss');
 var gulpRename = require('gulp-rename');
 var gulpStylus = require('gulp-stylus');
 var licensify = require('licensify');
 var notifier = require('node-notifier');
+var postcss = require('postcss');
 var vinylTransform  = require('vinyl-transform');
 var vinylSourceStream  = require('vinyl-source-stream');
 
@@ -142,4 +144,66 @@ gulp.task('build-stylus', function() {
     })
     .pipe(gulpRename('styles.css'))
     .pipe(gulp.dest('./public'));
+});
+
+gulp.task('postcss', function() {
+  return browserify('./es6/index.es6', {
+      debug: true,
+      extensions: ['.es6']
+    })
+    .transform(babelify)
+    .bundle()
+    .pipe(vinylSourceStream('bundle.js'))
+    .pipe(gulp.dest('./public'))
+  ;
+});
+
+//function onPostcssSass(options) {
+//  var stream = new require('stream').Transform({objectMode: true});
+//  stream._transform = function(file, encoding, cb) {
+//    if (file.isNull()) {
+//      return cb(null, file);
+//    }
+//    if (file.isStream()) {
+//      return cb(new Error('gulp-postcss-scss', 'ERROR!!'));
+//      //return cb(new PluginError('gulp-postcss-scss', error));
+//    } else if (file.isBuffer()) {
+//      try {
+//        var result = nano.process(String(file.contents), assign(options, {
+//            map: (file.sourceMap) ? {annotation: false} : false,
+//            from: file.relative,
+//            to: file.relative
+//        }));
+//        if (result.map && file.sourceMap) {
+//            applySourceMap(file, String(result.map));
+//            file.contents = new Buffer(result.css);
+//        } else {
+//            file.contents = new Buffer(result);
+//        }
+//
+//        this.push(file);
+//      } catch (e) {
+//        var p = new PluginError(PLUGIN_NAME, e, {fileName: file.path});
+//        this.emit('error', p);
+//      }
+//        cb();
+//      }
+//    }
+//  };
+//  return stream;
+//}
+
+gulp.task('postcss', function() {
+  return gulp.src('./postcss/index.css')
+    .pipe(gulpPostcss([
+      //require('autoprefixer-core')(),
+      //require('postcss-custom-properties')()
+      //require('postcss-sassy-mixins')()
+      //require('cssnano')()
+    ], {
+      //syntax: require('postcss-scss')
+    }))
+    .pipe(gulpRename('postcss.css'))
+    .pipe(gulp.dest('./public'))
+  ;
 });
