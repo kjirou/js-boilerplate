@@ -20,14 +20,14 @@
 .project
 .pydevproject
 .sqlite3-journal
-.svn/
-.tox/
-bower_components/
-develop-eggs/
-dist/
-eggs/
-node_modules/
-sdist/
+/.svn/
+/.tox/
+/bower_components/
+/develop-eggs/
+/dist/
+/eggs/
+/node_modules/
+/sdist/
 coverage
 nosetests.xml
 npm-debug.log
@@ -35,6 +35,4 @@ pip-log.txt
 testem.*.*.*.json
 
 
-build/*.js
-public/*.css
-public/*.js
+/public/dist/

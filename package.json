@@ -1,50 +1,52 @@
 {
   "name": "build-system-sandbox",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
-  "scripts": {
-    "build-requirements": "browserify -r backbone -r react > public/requirements.js",
-    "build-bundle": "browserify -x backbone -x react js/index.js > public/bundle.js",
-    "start": "http-server",
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/kjirou/browserify-sandbox.git"
-  },
   "author": "kjirou",
-  "license": "https://github.com/kjirou/browserify-sandbox/blob/master/LICENSE",
   "bugs": {
     "url": "https://github.com/kjirou/browserify-sandbox/issues"
   },
-  "homepage": "https://github.com/kjirou/browserify-sandbox",
+  "dependencies": {
+    "express": "4.12.0",
+    "react": "0.14.2",
+    "react-dom": "0.14.2"
+  },
   "devDependencies": {
-    "autoprefixer": "^5.2.0",
-    "autoprefixer-core": "^5.2.1",
-    "babel": "^4.6.3",
-    "babelify": "^5.0.3",
-    "browserify": "^9.0.3",
-    "gulp": "^3.8.11",
+    "autoprefixer": "5.2.0",
+    "autoprefixer-core": "5.2.1",
+    "babel": "5.8.29",
+    "babelify": "6.4.0",
+    "browser-sync": "2.9.12",
+    "browserify": "12.0.1",
+    "fixpack": "2.2.0",
+    "gulp": "3.9.0",
     "gulp-plumber": "0.6.6",
-    "gulp-postcss": "^6.0.0",
+    "gulp-postcss": "6.0.0",
     "gulp-rename": "1.2.0",
-    "gulp-stylus": "^2.0.1",
-    "http-server": "^0.7.5",
+    "gulp-stylus": "2.0.1",
+    "http-server": "0.8.5",
     "licensify": "1.4.0",
     "node-notifier": "4.1.2",
     "postcss": "5.0.4",
     "postcss-custom-properties": "5.0.0",
-    "postcss-sassy-mixins": "^1.0.0",
+    "postcss-sassy-mixins": "1.0.0",
     "postcss-scss": "0.1.2",
     "stylus": "0.50.0",
-    "vinyl-source-stream": "^1.0.0",
-    "vinyl-transform": "^1.0.0"
+    "vinyl-source-stream": "1.0.0",
+    "vinyl-transform": "1.0.0",
+    "watchify": "3.6.0"
   },
-  "dependencies": {
-    "backbone": "^1.1.2",
-    "express": "^4.12.0",
-    "react": "^0.12.2"
+  "homepage": "https://github.com/kjirou/browserify-sandbox",
+  "license": "https://github.com/kjirou/browserify-sandbox/blob/master/LICENSE",
+  "main": "index.js",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kjirou/browserify-sandbox.git"
   },
-  "private": true
+  "scripts": {
+    "build-bundle": "browserify -x backbone -x react js/index.js > public/bundle.js",
+    "build-requirements": "browserify -r backbone -r react > public/requirements.js",
+    "start": "http-server",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
 }
