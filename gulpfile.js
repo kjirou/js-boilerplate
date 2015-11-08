@@ -3,7 +3,6 @@ var browserify = require('browserify');
 var gulp = require('gulp');
 var gulpPostcss = require('gulp-postcss');
 var gulpRename = require('gulp-rename');
-var gulpStylus = require('gulp-stylus');
 var licensify = require('licensify');
 var notifier = require('node-notifier');
 var path = require('path');
