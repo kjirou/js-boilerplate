@@ -1,7 +1,6 @@
 var babelify = require('babelify');
 var browserify = require('browserify');
 var gulp = require('gulp');
-var gulpPlumber = require('gulp-plumber');
 var gulpPostcss = require('gulp-postcss');
 var gulpRename = require('gulp-rename');
 var gulpStylus = require('gulp-stylus');
@@ -9,7 +8,6 @@ var licensify = require('licensify');
 var notifier = require('node-notifier');
 var path = require('path');
 var postcss = require('postcss');
-var vinylTransform  = require('vinyl-transform');
 var vinylSourceStream  = require('vinyl-source-stream');
 var watchify = require('watchify');
 
