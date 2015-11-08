@@ -24,21 +24,13 @@ var ROOT = __dirname;
 var SRC_ROOT = path.join(ROOT, 'src');
 var PUBLIC_ROOT = path.join(ROOT, 'public');
 var PUBLIC_DIST_ROOT = path.join(PUBLIC_ROOT, 'dist');
-
 var SRC_FILE_PATH = path.join(SRC_ROOT, 'index.js');
-var DIST_FILE_NAME = 'app.js';
 
 
-function createTransformer() {
-  return babelify.configure({
-    // configure babel options)
-    // http://babeljs.io/docs/usage/options/
-  });
-}
-
-function createBundler(transformer, options) {
+function createBundler(options) {
   options = options || {};
-  var isWatchfied = Boolean(options.isWatchfied);  // default = false
+  var transformer = options.transformer || null;
+  var isWatchfied = Boolean(options.isWatchfied);
 
   var browserifyOptions = {};
   if (isWatchfied) {
@@ -55,13 +47,22 @@ function createBundler(transformer, options) {
 
   var bundler = browserify(SRC_FILE_PATH, browserifyOptions);
 
-  bundler.transform(transformer);
+  if (transformer) {
+    bundler.transform(transformer);
+  }
 
   if (isWatchfied) {
     bundler = watchify(bundler);
   }
 
   return bundler;
+}
+
+function createTransformer() {
+  return babelify.configure({
+    // Configure babel options here
+    // Ref) http://babeljs.io/docs/usage/options/
+  });
 }
 
 function bundle(bundler, options) {
@@ -71,30 +72,33 @@ function bundle(bundler, options) {
   return bundler
     .bundle()
     .on('error', onError)
-    .pipe(vinylSourceStream(DIST_FILE_NAME))
+    .pipe(vinylSourceStream('app.js'))
     .pipe(gulp.dest(PUBLIC_DIST_ROOT))
   ;
 }
 
 
 gulp.task('build:js', function() {
-  var transformer = createTransformer();
-  var bundler = createBundler(transformer, {
-    debug: true  // Append source map
+  var bundler = createBundler({
+    transformer: createTransformer(),
+    debug: true  // Enable source map
     //extensions: ['js', 'jsx']
   });
   return bundle(bundler);
 });
 
 gulp.task('watch:js', function() {
-  var transformer = createTransformer();
-  var bundler = createBundler(transformer, {
+  var bundler = createBundler({
+    transformer: createTransformer(),
     isWatchfied: true,
     debug: true
   });
-  bundler.on('update', function() {
-    bundle(bundler, {
-      onError: function onError() {
+  bundle(bundler);
+
+  bundler.on('update', function onUpdate() {
+    console.log('Build JavaScripts at ' + (new Date()).toTimeString());
+    var bundling = bundle(bundler,{
+      onError: function onError(err) {
         console.error(err.stack);
         notifier.notify({
           message: err.message,
@@ -103,6 +107,7 @@ gulp.task('watch:js', function() {
         this.emit('end');
       }
     });
+    bundling.pipe(browserSync.stream({ once: true }));
   });
 });
 
@@ -114,36 +119,10 @@ gulp.task('serve', function() {
   });
 });
 
+gulp.task('build', ['build:js']);
+gulp.task('develop', ['watch:js', 'serve']);
 
-//gulp.task('build-js-requirements', function() {
-//  return browserify({
-//      debug: true
-//    })
-//    .require(JS_REQUIREMENTS)
-//    .plugin(licensify)
-//    .bundle()
-//    .pipe(vinylSourceStream('requirements.js'))
-//    .pipe(gulp.dest('./public'))
-//  ;
-//});
-//
-//gulp.task('build-js-app', function() {
-//  return browserify('./js/index.js', {
-//      debug: true
-//    })
-//    .external(JS_REQUIREMENTS)
-//    .bundle()
-//    .pipe(vinylSourceStream('bundle.js'))
-//    .pipe(gulp.dest('./public'))
-//  ;
-//});
-//
-//gulp.task('watch-es6', function() {
-//  gulp.watch(WATCHED_ES6_SOURCES, function() {
-//    return gulp.start('build-es6-app');
-//  });
-//});
-//
+
 //gulp.task('build-stylus', function() {
 //  // ちなみに stylus の @import はファイルが無くても例外を吐かないので
 //  // @require の方が良い

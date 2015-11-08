@@ -1,6 +1,6 @@
 {
   "name": "build-system-sandbox",
-  "version": "1.0.0",
+  "version": "0.0.0",
   "author": "kjirou",
   "bugs": {
     "url": "https://github.com/kjirou/browserify-sandbox/issues"
@@ -42,9 +42,8 @@
     "url": "https://github.com/kjirou/browserify-sandbox.git"
   },
   "scripts": {
-    "build-bundle": "browserify -x backbone -x react js/index.js > public/bundle.js",
-    "build-requirements": "browserify -r backbone -r react > public/requirements.js",
-    "start": "http-server",
+    "build": "gulp build",
+    "develop": "gulp develop",
     "test": "echo \"Error: no test specified\" && exit 1"
   }
 }
