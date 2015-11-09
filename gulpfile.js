@@ -114,7 +114,8 @@ gulp.task('serve', function() {
   browserSync.init({
     server: {
       baseDir: PUBLIC_ROOT
-    }
+    },
+    notify: false
   });
 });
 
