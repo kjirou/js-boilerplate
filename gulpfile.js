@@ -1,3 +1,4 @@
+var autoprefixer = require('autoprefixer');
 var babelify = require('babelify');
 var browserify = require('browserify');
 var gulp = require('gulp');
@@ -6,7 +7,9 @@ var gulpPostcss = require('gulp-postcss');
 var licensify = require('licensify');
 var notifier = require('node-notifier');
 var path = require('path');
-var postcss = require('postcss');
+var postcssCustomProperties = require('postcss-custom-properties');
+var postcssSassyMixins = require('postcss-sassy-mixins');
+var postcssScss = require('postcss-scss');
 var vinylSourceStream  = require('vinyl-source-stream');
 var watchify = require('watchify');
 
@@ -111,14 +114,14 @@ gulp.task('watch:js', function() {
   });
 });
 
-gulp.task('postcss', function() {
+gulp.task('build:css', function() {
   return gulp.src(CSS_INDEX_FILE_PATH)
     .pipe(gulpPostcss([
-      require('autoprefixer')(),
-      require('postcss-custom-properties')(),
-      require('postcss-sassy-mixins')()
+      autoprefixer(),
+      postcssCustomProperties(),
+      postcssSassyMixins()
     ], {
-      syntax: require('postcss-scss')
+      syntax: postcssScss
     }))
     .pipe(gulpRename('app.css'))
     .pipe(gulp.dest(PUBLIC_DIST_ROOT))
