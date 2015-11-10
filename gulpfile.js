@@ -29,7 +29,23 @@ var PUBLIC_ROOT = path.join(ROOT, 'public');
 var PUBLIC_DIST_ROOT = path.join(PUBLIC_ROOT, 'dist');
 var JS_INDEX_FILE_PATH = path.join(SRC_ROOT, 'index.js');
 var CSS_INDEX_FILE_PATH = path.join(SRC_ROOT, 'styles/index.scss');
+var IMAGES_FILE_PATH = path.join(SRC_ROOT, '**/*.{gif,jpg,png}');
+var STYLES_FILE_PATH = path.join(SRC_ROOT, '**/*.scss');
 
+
+function onErrorToWarn(err) {
+  console.error(err.stack);
+  notifier.notify({
+    message: err.message,
+    title: 'Gulp Error'
+  });
+  this.emit('end');
+}
+
+
+//
+// JavaScripts
+//
 
 function createBundler(options) {
   options = options || {};
@@ -81,7 +97,6 @@ function bundle(bundler, options) {
   ;
 }
 
-
 gulp.task('build:js', function() {
   var bundler = createBundler({
     transformer: createTransformer(),
@@ -102,20 +117,21 @@ gulp.task('watch:js', function() {
   bundler.on('update', function onUpdate() {
     console.log('Build JavaScripts at ' + (new Date()).toTimeString());
     var bundling = bundle(bundler,{
-      onError: function onError(err) {
-        console.error(err.stack);
-        notifier.notify({
-          message: err.message,
-          title: 'Build Error'
-        });
-        this.emit('end');
-      }
+      onError: onErrorToWarn
     });
     bundling.pipe(browserSync.stream({ once: true }));
   });
 });
 
-gulp.task('build:css', function() {
+
+//
+// Stylesheets & Other Asserts
+//
+
+function createCssBundler(options) {
+  options = options || {};
+  var onError = options.onError || function onError(err) { throw err; };
+
   return gulp.src(CSS_INDEX_FILE_PATH)
     .pipe(gulpPostcss([
       postcssCustomProperties(),
@@ -126,13 +142,50 @@ gulp.task('build:css', function() {
     ], {
       syntax: postcssScss
     }))
-    //.on('error', function(err) {
-    //  // do stuff
-    //})
+    .on('error', onError)
     .pipe(gulpRename('app.css'))
     .pipe(gulp.dest(PUBLIC_DIST_ROOT))
   ;
+};
+
+gulp.task('build:css', function() {
+  return createCssBundler();
 });
+
+gulp.task('build:images', function() {
+  return gulp.src(IMAGES_FILE_PATH)
+    .pipe(gulp.dest(PUBLIC_DIST_ROOT))
+  ;
+});
+
+gulp.task('watch:assets', function() {
+
+  // css
+  gulp.watch([STYLES_FILE_PATH], function() {
+    return createCssBundler({ onError: onErrorToWarn })
+      .pipe(browserSync.stream({ once: true }))
+      .on('data', function() {
+        console.log('Build stylesheets at ' + new Date().toTimeString());
+      })
+    ;
+  });
+
+  // images
+  gulp.watch([IMAGES_FILE_PATH], function() {
+    return gulp.src(IMAGES_FILE_PATH)
+      .on('error', onErrorToWarn)
+      .pipe(gulp.dest(PUBLIC_DIST_ROOT))
+      .on('data', function() {
+        console.log('Build images at ' + new Date().toTimeString());
+      })
+    ;
+  });
+});
+
+
+//
+// Others
+//
 
 gulp.task('serve', function() {
   browserSync.init({
@@ -143,33 +196,5 @@ gulp.task('serve', function() {
   });
 });
 
-gulp.task('build', ['build:css', 'build:js']);
-gulp.task('develop', ['watch:js', 'serve']);
-
-
-//gulp.task('build-stylus', function() {
-//  // ちなみに stylus の @import はファイルが無くても例外を吐かないので
-//  // @require の方が良い
-//  gulp.src('./stylus/index.styl')
-//    // オプションの仕様は、一部の gulp-stylus 用のものを除いて stylus.render に渡される
-//    //
-//    // gulp-stylus options)
-//    // https://github.com/stevelacy/gulp-stylus/blob/master/index.js
-//    //
-//    // stylus.render options)
-//    // http://learnboost.github.io/stylus/docs/js.html
-//    //
-//    .pipe(gulpStylus({
-//      // stylus 内で import or require しないで css 上だけで事前に読み込みたい場合
-//      // import: ['nib'],
-//      // TODO: lineno 効いてない気がする
-//      lineno: true
-//    }))
-//    // デフォルトで成功しても何も出力しない（特に watch 時には gulp 出力もないので何もでない）
-//    // ので、不安ならこういう感じのを入れる
-//    .on('data', function() {
-//      console.log(new Date().toString() + ': Compiled stylus');
-//    })
-//    .pipe(gulpRename('styles.css'))
-//    .pipe(gulp.dest('./public'));
-//});
+gulp.task('build', ['build:images', 'build:css', 'build:js']);
+gulp.task('develop', ['watch:assets', 'watch:js', 'serve']);
