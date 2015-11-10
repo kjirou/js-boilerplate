@@ -1,0 +1,15 @@
+// For postcss-custom-properties test
+:root {
+  --color: red;
+}
+
+#js-app-container {
+  .component {
+    color: var(--color);
+  }
+}
+
+// For autoprefixer test
+a {
+  display: flex;
+}

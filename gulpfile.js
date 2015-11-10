@@ -8,6 +8,7 @@ var licensify = require('licensify');
 var notifier = require('node-notifier');
 var path = require('path');
 var postcssCustomProperties = require('postcss-custom-properties');
+var postcssNested = require('postcss-nested');
 var postcssSassyMixins = require('postcss-sassy-mixins');
 var postcssScss = require('postcss-scss');
 var vinylSourceStream  = require('vinyl-source-stream');
@@ -26,8 +27,8 @@ var ROOT = __dirname;
 var SRC_ROOT = path.join(ROOT, 'src');
 var PUBLIC_ROOT = path.join(ROOT, 'public');
 var PUBLIC_DIST_ROOT = path.join(PUBLIC_ROOT, 'dist');
-var SRC_FILE_PATH = path.join(SRC_ROOT, 'index.js');
-var CSS_INDEX_FILE_PATH = path.join(SRC_ROOT, 'styles/index.css');
+var JS_INDEX_FILE_PATH = path.join(SRC_ROOT, 'index.js');
+var CSS_INDEX_FILE_PATH = path.join(SRC_ROOT, 'styles/index.scss');
 
 
 function createBundler(options) {
@@ -48,7 +49,7 @@ function createBundler(options) {
     browserifyOptions[key] = options[key];
   });
 
-  var bundler = browserify(SRC_FILE_PATH, browserifyOptions);
+  var bundler = browserify(JS_INDEX_FILE_PATH, browserifyOptions);
 
   if (transformer) {
     bundler.transform(transformer);
@@ -117,12 +118,17 @@ gulp.task('watch:js', function() {
 gulp.task('build:css', function() {
   return gulp.src(CSS_INDEX_FILE_PATH)
     .pipe(gulpPostcss([
-      autoprefixer(),
       postcssCustomProperties(),
-      postcssSassyMixins()
+      // Output "Container#eachAtRule is deprecated. Use Container#walkAtRules instead." now
+      postcssSassyMixins(),
+      postcssNested(),
+      autoprefixer()
     ], {
       syntax: postcssScss
     }))
+    //.on('error', function(err) {
+    //  // do stuff
+    //})
     .pipe(gulpRename('app.css'))
     .pipe(gulp.dest(PUBLIC_DIST_ROOT))
   ;
@@ -137,7 +143,7 @@ gulp.task('serve', function() {
   });
 });
 
-gulp.task('build', ['build:js']);
+gulp.task('build', ['build:css', 'build:js']);
 gulp.task('develop', ['watch:js', 'serve']);
 
 
