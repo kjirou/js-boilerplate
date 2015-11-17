@@ -171,6 +171,7 @@ gulp.task('watch:assets', function() {
   });
 
   // images
+  // Note: This task is almost useless, because gulp can not observe new files
   gulp.watch([IMAGES_FILE_PATH], function() {
     return gulp.src(IMAGES_FILE_PATH)
       .on('error', onErrorToWarn)
