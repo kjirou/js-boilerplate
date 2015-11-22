@@ -35,7 +35,7 @@ var STYLES_FILE_PATH = path.join(SRC_ROOT, '**/*.scss');
 
 
 function onErrorToWarn(err) {
-  console.error(err.stack);
+  console.error(err.stack || err.message);
   notifier.notify({
     message: err.message,
     title: 'Gulp Error'
