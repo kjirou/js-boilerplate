@@ -1,3 +1,7 @@
+@import 'normalize.css';
+
+@import '_foo.scss';
+
 // For postcss-custom-properties test
 :root {
   --color: red;
