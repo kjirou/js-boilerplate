@@ -1,11 +1,16 @@
-//@import 'normalize.css';
+/*@import 'normalize.css';*/
 @import 'sanitize.css';
 
-@import '_foo.scss';
 
-// For postcss-custom-properties test
+/*
+ * For postcss-custom-properties test
+ */
 :root {
   --color: red;
+}
+
+body {
+  background-color: gray;
 }
 
 #js-app-container {
@@ -14,7 +19,12 @@
   }
 }
 
-// For autoprefixer test
+/*
+ * For autoprefixer test
+ */
 a {
   display: flex;
 }
+
+
+@import '_foo.scss';
