@@ -6,6 +6,7 @@ var gulpConcat = require('gulp-concat');
 var gulpImageDataURI = require('gulp-image-data-uri');
 var gulpPostcss = require('gulp-postcss');
 var gulpRename = require('gulp-rename');
+var gulpShell = require('gulp-shell');
 var licensify = require('licensify');
 var notifier = require('node-notifier');
 var path = require('path');
@@ -180,6 +181,12 @@ gulp.task('build:assets', function() {
   runSequence(['build:css', 'build:images'], 'build:data-uri-images');
 });
 
+gulp.task('build:any-shell-scripts', gulpShell.task([
+  'sh ./scripts/run-heavy-build-task.sh',
+  // Can return error as gulp's result
+  //'sh ./scripts/run-failed-task.sh'
+]));
+
 gulp.task('watch:assets', function() {
 
   // css
@@ -219,7 +226,7 @@ gulp.task('serve', function() {
   });
 });
 
-gulp.task('build', ['build:js', 'build:assets']);
+gulp.task('build', ['build:js', 'build:assets', 'build:any-shell-scripts']);
 gulp.task('develop', function() {
   runSequence('build', ['watch:js', 'watch:assets'], 'serve');
 });
