@@ -2,8 +2,10 @@ var autoprefixer = require('autoprefixer');
 var babelify = require('babelify');
 var browserify = require('browserify');
 var gulp = require('gulp');
-var gulpRename = require('gulp-rename');
+var gulpConcat = require('gulp-concat');
+var gulpImageDataURI = require('gulp-image-data-uri');
 var gulpPostcss = require('gulp-postcss');
+var gulpRename = require('gulp-rename');
 var licensify = require('licensify');
 var notifier = require('node-notifier');
 var path = require('path');
@@ -162,7 +164,21 @@ gulp.task('build:images', function() {
   ;
 });
 
-gulp.task('build:assets', ['build:css', 'build:images']);
+gulp.task('build:data-uri-images', function() {
+  return gulp.src(path.join(PUBLIC_DIST_ROOT, 'images/**/*.png'))
+    .pipe(gulpImageDataURI({
+      template: {
+        file: path.join(ROOT, 'gulp-image-data-uri-template.css')
+      }
+    }))
+    .pipe(gulpConcat('data-uri-images.css'))
+    .pipe(gulp.dest(PUBLIC_DIST_ROOT))
+  ;
+});
+
+gulp.task('build:assets', function() {
+  runSequence(['build:css', 'build:images'], 'build:data-uri-images');
+});
 
 gulp.task('watch:assets', function() {
 
