@@ -1,5 +1,6 @@
 {
   "name": "js-boilerplate",
+  "description": "My awesome application!",
   "version": "0.0.0",
   "author": "kjirou",
   "bugs": {
@@ -40,6 +41,8 @@
   },
   "homepage": "https://github.com/kjirou/js-boilerplate",
   "license": "MIT",
+  "main": "src/components/Root.js",
+  "private": true,
   "repository": {
     "type": "git",
     "url": "https://github.com/kjirou/js-boilerplate.git"
