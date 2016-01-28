@@ -16,7 +16,7 @@
     "babel-preset-es2015": "6.3.13",
     "babel-preset-react": "6.3.13",
     "babelify": "7.2.0",
-    "browser-sync": "2.9.12",
+    "browser-sync": "2.11.1",
     "browserify": "13.0.0",
     "fixpack": "2.2.0",
     "gulp": "3.9.0",
