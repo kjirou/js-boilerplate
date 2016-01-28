@@ -17,7 +17,7 @@
     "babel-preset-react": "6.3.13",
     "babelify": "7.2.0",
     "browser-sync": "2.9.12",
-    "browserify": "12.0.1",
+    "browserify": "13.0.0",
     "fixpack": "2.2.0",
     "gulp": "3.9.0",
     "gulp-concat": "2.6.0",
@@ -36,7 +36,7 @@
     "run-sequence": "1.1.5",
     "sanitize.css": "3.0.0",
     "vinyl-source-stream": "1.1.0",
-    "watchify": "3.6.0"
+    "watchify": "3.7.0"
   },
   "engines": {
     "node": ">=4.2",
