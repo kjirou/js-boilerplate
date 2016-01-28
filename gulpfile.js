@@ -31,7 +31,7 @@ var IMAGES_FILE_PATH = path.join(SRC_ROOT, '**/*.{gif,jpg,png}');
 var STYLES_FILE_PATH = path.join(SRC_ROOT, '**/*.scss');
 
 
-function onErrorToWarn(err) {
+function handleErrorAsWarning(err) {
   console.error(err.stack || err.message);
   notifier.notify({
     message: err.message,
@@ -119,7 +119,7 @@ gulp.task('watch:js', function() {
   bundler.on('update', function onUpdate() {
     console.log('Build JavaScripts at ' + (new Date()).toTimeString());
     var bundling = bundle(bundler,{
-      onError: onErrorToWarn
+      onError: handleErrorAsWarning
     });
     bundling.pipe(browserSync.stream({ once: true }));
   });
@@ -185,7 +185,7 @@ gulp.task('watch:assets', function() {
 
   // css
   gulp.watch([STYLES_FILE_PATH], function() {
-    return createCssBundler({ onError: onErrorToWarn })
+    return createCssBundler({ onError: handleErrorAsWarning })
       .pipe(browserSync.stream({ once: true }))
       .on('data', function() {
         console.log('Build stylesheets at ' + new Date().toTimeString());
@@ -197,7 +197,7 @@ gulp.task('watch:assets', function() {
   // Note: This task is almost useless, because gulp can not observe new files
   gulp.watch([IMAGES_FILE_PATH], function() {
     return gulp.src(IMAGES_FILE_PATH)
-      .on('error', onErrorToWarn)
+      .on('error', handleErrorAsWarning)
       .pipe(gulp.dest(PUBLIC_DIST_ROOT))
       .on('data', function() {
         console.log('Build images at ' + new Date().toTimeString());
