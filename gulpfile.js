@@ -21,12 +21,6 @@ var watchify = require('watchify');
 var browserSync = require('browser-sync').create();
 
 
-//
-// Refs)
-// https://github.com/Browsersync/recipes/tree/master/recipes/gulp.browserify
-// https://gist.github.com/Fishrock123/8ea81dad3197c2f84366
-//
-
 var ROOT = __dirname;
 var SRC_ROOT = path.join(ROOT, 'src');
 var PUBLIC_ROOT = path.join(ROOT, 'public');
