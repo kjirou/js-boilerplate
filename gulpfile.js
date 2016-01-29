@@ -49,9 +49,17 @@ function handleErrorAsWarning(err) {
 // JavaScripts
 //
 
+function createTransformer() {
+  return babelify.configure({
+    // Configure babel options here
+    // Ref) http://babeljs.io/docs/usage/options/
+    presets: babelRcData.presets,
+  });
+}
+
 function createBundler(options) {
   options = options || {};
-  var transformer = options.transformer || null;
+  var transformer = options.transformer || createTransformer();
   var isWatchfied = Boolean(options.isWatchfied);
 
   var browserifyOptions = {};
@@ -78,14 +86,6 @@ function createBundler(options) {
   }
 
   return bundler;
-}
-
-function createTransformer() {
-  return babelify.configure({
-    // Configure babel options here
-    // Ref) http://babeljs.io/docs/usage/options/
-    presets: babelRcData.presets,
-  });
 }
 
 function bundle(bundler, options) {
