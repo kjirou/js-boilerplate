@@ -1,6 +1,7 @@
 var autoprefixer = require('autoprefixer');
 var babelify = require('babelify');
 var browserify = require('browserify');
+var fs = require('fs');
 var gulp = require('gulp');
 var gulpConcat = require('gulp-concat');
 var gulpImageDataURI = require('gulp-image-data-uri');
@@ -29,6 +30,9 @@ var JS_INDEX_FILE_PATH = path.join(SRC_ROOT, 'index.js');
 var CSS_INDEX_FILE_PATH = path.join(SRC_ROOT, 'styles/index.scss');
 var IMAGES_FILE_PATH = path.join(SRC_ROOT, '**/*.{gif,jpg,png}');
 var STYLES_FILE_PATH = path.join(SRC_ROOT, '**/*.scss');
+
+var babelRc = fs.readFileSync(path.join(ROOT, '.babelrc'));
+var babelRcData = JSON.parse(babelRc.toString());
 
 
 function handleErrorAsWarning(err) {
@@ -80,10 +84,7 @@ function createTransformer() {
   return babelify.configure({
     // Configure babel options here
     // Ref) http://babeljs.io/docs/usage/options/
-    presets: [
-      'es2015',
-      'react'
-    ]
+    presets: babelRcData.presets,
   });
 }
 
