@@ -24,13 +24,16 @@ const watchify = require('watchify');
 
 
 const ROOT = __dirname;
-const SRC_ROOT = path.join(ROOT, 'src');
+const SOURCE_ROOT = path.join(ROOT, 'src');
 const PUBLIC_ROOT = path.join(ROOT, 'public');
 const PUBLIC_DIST_ROOT = path.join(PUBLIC_ROOT, 'dist');
-const JS_SOURCE_INDEX_FILE_PATH = path.join(SRC_ROOT, 'index.js');
-const CSS_SOURCE_INDEX_FILE_PATH = path.join(SRC_ROOT, 'styles/index.scss');
-const CSS_SOURCE_PATTERN = path.join(SRC_ROOT, '**/*.scss');
-const IMAGES_FILE_PATH = path.join(SRC_ROOT, '**/*.{gif,jpg,png}');
+const JS_SOURCE_INDEX_FILE_PATH = path.join(SOURCE_ROOT, 'index.js');
+const CSS_SOURCE_INDEX_FILE_PATH = path.join(SOURCE_ROOT, 'styles/index.scss');
+const CSS_SOURCE_PATTERN = path.join(SOURCE_ROOT, '**/*.scss');
+const STATIC_FILE_PATTERNS = [
+  path.join(SOURCE_ROOT, '**/*.{gif,jpg,png}'),
+  path.join(SOURCE_ROOT, '**/*.{json,txt}'),
+];
 
 const browserSyncInstance = browserSync.create();
 
@@ -185,11 +188,25 @@ gulp.task('watch:css', function() {
  * Static files
  */
 
-gulp.task('build:images', function() {
-  return gulp.src(IMAGES_FILE_PATH)
+gulp.task('build:static-files', function() {
+  return gulp.src(STATIC_FILE_PATTERNS)
     .pipe(gulp.dest(PUBLIC_DIST_ROOT))
   ;
 });
+
+// Notice: gulp can not observe new files
+gulp.task('watch:static-file', function() {
+  gulp.watch(STATIC_FILE_PATTERNS, function() {
+    return gulp.src(STATIC_FILE_PATTERNS)
+      .on('error', handleErrorAsWarning)
+      .pipe(gulp.dest(PUBLIC_DIST_ROOT))
+      .on('data', () => console.log(`Built static files at ${ new Date().toTimeString() }`))
+    ;
+  });
+});
+
+
+
 
 gulp.task('build:data-uri-images', function() {
   return gulp.src(path.join(PUBLIC_DIST_ROOT, 'images/**/*.png'))
@@ -212,32 +229,6 @@ gulp.task('build:any-shell-scripts', gulpShell.task([
   // Can return error as gulp's result
   //'sh ./scripts/run-failed-task.sh'
 ]));
-
-gulp.task('watch:assets', function() {
-
-  // css
-  gulp.watch([STYLES_FILE_PATH], function() {
-    return createStylesheetsBundler({ onError: handleErrorAsWarning })
-      .pipe(browserSyncInstance.stream({ once: true }))
-      .on('data', function() {
-        console.log('Build stylesheets at ' + new Date().toTimeString());
-      })
-    ;
-  });
-
-  // images
-  // Note: This task is almost useless, because gulp can not observe new files
-  gulp.watch([IMAGES_FILE_PATH], function() {
-    return gulp.src(IMAGES_FILE_PATH)
-      .on('error', handleErrorAsWarning)
-      .pipe(gulp.dest(PUBLIC_DIST_ROOT))
-      .on('data', function() {
-        console.log('Build images at ' + new Date().toTimeString());
-      })
-    ;
-  });
-});
-
 
 //
 // Others
