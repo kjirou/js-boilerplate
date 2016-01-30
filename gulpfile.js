@@ -195,11 +195,12 @@ gulp.task('build:static-files', function() {
 });
 
 // Notice: gulp can not observe new files
-gulp.task('watch:static-file', function() {
+gulp.task('watch:static-files', function() {
   gulp.watch(STATIC_FILE_PATTERNS, function() {
     return gulp.src(STATIC_FILE_PATTERNS)
       .on('error', handleErrorAsWarning)
       .pipe(gulp.dest(PUBLIC_DIST_ROOT))
+      // TODO: Output this message for each file
       .on('data', () => console.log(`Built static files at ${ new Date().toTimeString() }`))
     ;
   });
