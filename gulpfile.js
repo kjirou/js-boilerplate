@@ -1,179 +1,229 @@
-var autoprefixer = require('autoprefixer');
-var babelify = require('babelify');
-var browserify = require('browserify');
-var fs = require('fs');
-var gulp = require('gulp');
-var gulpConcat = require('gulp-concat');
-var gulpImageDataURI = require('gulp-image-data-uri');
-var gulpPostcss = require('gulp-postcss');
-var gulpRename = require('gulp-rename');
-var gulpShell = require('gulp-shell');
-var licensify = require('licensify');
-var notifier = require('node-notifier');
-var path = require('path');
-var postcssCustomProperties = require('postcss-custom-properties');
-var postcssImport = require('postcss-import');
-var postcssNested = require('postcss-nested');
-var postcssScss = require('postcss-scss');
-var runSequence = require('run-sequence');
-var vinylSourceStream  = require('vinyl-source-stream');
-var watchify = require('watchify');
+'use strict';
 
-var browserSync = require('browser-sync').create();
-
-
-var ROOT = __dirname;
-var SRC_ROOT = path.join(ROOT, 'src');
-var PUBLIC_ROOT = path.join(ROOT, 'public');
-var PUBLIC_DIST_ROOT = path.join(PUBLIC_ROOT, 'dist');
-var JS_INDEX_FILE_PATH = path.join(SRC_ROOT, 'index.js');
-var CSS_INDEX_FILE_PATH = path.join(SRC_ROOT, 'styles/index.scss');
-var IMAGES_FILE_PATH = path.join(SRC_ROOT, '**/*.{gif,jpg,png}');
-var STYLES_FILE_PATH = path.join(SRC_ROOT, '**/*.scss');
-
-var babelRc = fs.readFileSync(path.join(ROOT, '.babelrc'));
-var babelRcData = JSON.parse(babelRc.toString());
+const autoprefixer = require('autoprefixer');
+const babelify = require('babelify');
+const browserSync = require('browser-sync');
+const browserify = require('browserify');
+const fs = require('fs');
+const gulp = require('gulp');
+const gulpConcat = require('gulp-concat');
+const gulpImageDataURI = require('gulp-image-data-uri');
+const gulpPostcss = require('gulp-postcss');
+const gulpRename = require('gulp-rename');
+const gulpShell = require('gulp-shell');
+const licensify = require('licensify');
+const notifier = require('node-notifier');
+const path = require('path');
+const postcssCustomProperties = require('postcss-custom-properties');
+const postcssImport = require('postcss-import');
+const postcssNested = require('postcss-nested');
+const postcssScss = require('postcss-scss');
+const runSequence = require('run-sequence');
+const vinylSourceStream  = require('vinyl-source-stream');
+const watchify = require('watchify');
 
 
-function handleErrorAsWarning(err) {
+const ROOT = __dirname;
+const SOURCE_ROOT = path.join(ROOT, 'src');
+const PUBLIC_ROOT = path.join(ROOT, 'public');
+const PUBLIC_DIST_ROOT = path.join(PUBLIC_ROOT, 'dist');
+const JS_SOURCE_INDEX_FILE_PATH = path.join(SOURCE_ROOT, 'index.js');
+const CSS_SOURCE_INDEX_FILE_PATH = path.join(SOURCE_ROOT, 'styles/index.scss');
+const CSS_SOURCE_PATTERN = path.join(SOURCE_ROOT, '**/*.scss');
+const STATIC_FILE_PATTERNS = [
+  path.join(SOURCE_ROOT, '**/*.{gif,jpg,png}'),
+  path.join(SOURCE_ROOT, '**/*.{json,txt}'),
+];
+const DATA_URI_IMAGE_PATTERNS = [
+  path.join(SOURCE_ROOT, 'images/*.png'),
+];
+
+const browserSyncInstance = browserSync.create();
+
+const babelRc = fs.readFileSync(path.join(ROOT, '.babelrc'));
+const babelRcData = JSON.parse(babelRc.toString());
+
+
+/*
+ * Utils
+ */
+
+const handleErrorAsWarning = function(err) {
   console.error(err.stack || err.message);
   notifier.notify({
     message: err.message,
-    title: 'Gulp Error'
+    title: 'Gulp Error',
   });
   this.emit('end');
 }
 
 
-//
-// JavaScripts
-//
+/*
+ * .js builders
+ */
 
-function createTransformer() {
+const createBabelTransformer = () => {
   return babelify.configure({
     // Configure babel options here
     // Ref) http://babeljs.io/docs/usage/options/
     presets: babelRcData.presets,
   });
-}
+};
 
-function createBundler(options) {
-  options = options || {};
-  var transformer = options.transformer || createTransformer();
-  var isWatchfied = Boolean(options.isWatchfied);
+const createJsSourcesBundler = (indexFilePath, options) => {
+  options = Object.assign({
+    transformer: createBabelTransformer(),
+    isWatchfied: false,
+  }, options || {});
 
-  var browserifyOptions = {};
-  if (isWatchfied) {
-    Object.keys(watchify.args).forEach(function(key) {
-      browserifyOptions[key] = watchify.args[key];
-    });
+  const browserifyOptions = {
+    debug: true,
+  };
+
+  if (options.isWatchfied) {
+    Object.assign(browserifyOptions, watchify.args);
   }
+
   // Pass options to browserify by whitelist
   [
     'debug'
-  ].forEach(function(key) {
-    browserifyOptions[key] = options[key];
+  ].forEach(key => {
+    if (key in options) {
+      browserifyOptions[key] = options[key];
+    }
   });
 
-  var bundler = browserify(JS_INDEX_FILE_PATH, browserifyOptions);
+  let bundler = browserify(indexFilePath, browserifyOptions);
 
-  if (transformer) {
-    bundler.transform(transformer);
+  if (options.transformer) {
+    bundler.transform(options.transformer);
   }
 
-  if (isWatchfied) {
+  if (options.isWatchfied) {
     bundler = watchify(bundler);
   }
 
   return bundler;
 }
 
-function bundle(bundler, options) {
-  options = options || {};
-  var onError = options.onError || function onError(err) { throw err; };
+const bundleJsSources = (bundler, options) => {
+  options = Object.assign({
+    errorHandler: function(err) { throw err; },
+    outputFileName: 'app.js',
+  }, options || {});
 
   return bundler
     .bundle()
-    .on('error', onError)
-    .pipe(vinylSourceStream('app.js'))
+    .on('error', options.errorHandler)
+    .pipe(vinylSourceStream(options.outputFileName))
     .pipe(gulp.dest(PUBLIC_DIST_ROOT))
   ;
 }
 
 gulp.task('build:js', function() {
-  var bundler = createBundler({
-    transformer: createTransformer(),
-    debug: true  // Enable source map
-    //extensions: ['js', 'jsx']
-  });
-  return bundle(bundler);
+  const bundler = createJsSourcesBundler(JS_SOURCE_INDEX_FILE_PATH);
+  return bundleJsSources(bundler);
 });
 
 gulp.task('watch:js', function() {
-  var bundler = createBundler({
-    transformer: createTransformer(),
+  const bundler = createJsSourcesBundler(JS_SOURCE_INDEX_FILE_PATH, {
     isWatchfied: true,
-    debug: true
   });
-  bundle(bundler);
+  bundleJsSources(bundler);  // TODO: Why is this necessary?
 
-  bundler.on('update', function onUpdate() {
-    console.log('Build JavaScripts at ' + (new Date()).toTimeString());
-    var bundling = bundle(bundler,{
-      onError: handleErrorAsWarning
-    });
-    bundling.pipe(browserSync.stream({ once: true }));
+  bundler.on('update', function() {
+    console.log(`Built .js at ${ new Date().toTimeString() }`);
+    bundleJsSources(bundler, { errorHandler: handleErrorAsWarning })
+      .pipe(browserSyncInstance.stream({ once: true }))
+    ;
   });
 });
 
 
-//
-// Stylesheets & Other Asserts
-//
+/*
+ * .css builders
+ */
 
-function createCssBundler(options) {
-  options = options || {};
-  var onError = options.onError || function onError(err) { throw err; };
-
-  return gulp.src(CSS_INDEX_FILE_PATH)
-    .pipe(gulpPostcss([
+const createPostcssTransformer = () => {
+  return gulpPostcss(
+    [
       postcssImport(),
       postcssCustomProperties(),
       postcssNested(),
-      autoprefixer()
-    ], {
+      autoprefixer(),
+    ],
+    {
       syntax: postcssScss
-    }))
-    .on('error', onError)
-    .pipe(gulpRename('app.css'))
+    }
+  );
+};
+
+const bundleCssSources = (indexFilePath, options) => {
+  options = Object.assign({
+    transformer: createPostcssTransformer(),
+    errorHandler: function(err) { throw err; },
+    outputFileName: 'app.css',
+  }, options || {});
+
+  return gulp.src(indexFilePath)
+    .pipe(options.transformer)
+    .on('error', options.errorHandler)
+    .pipe(gulpRename(options.outputFileName))
     .pipe(gulp.dest(PUBLIC_DIST_ROOT))
   ;
 };
 
 gulp.task('build:css', function() {
-  return createCssBundler();
+  return bundleCssSources(CSS_SOURCE_INDEX_FILE_PATH);
 });
 
-gulp.task('build:images', function() {
-  return gulp.src(IMAGES_FILE_PATH)
+gulp.task('watch:css', function() {
+  gulp.watch([CSS_SOURCE_PATTERN], function() {
+    return bundleCssSources(CSS_SOURCE_INDEX_FILE_PATH, { errorHandler: handleErrorAsWarning })
+      .pipe(browserSyncInstance.stream({ once: true }))
+      .on('data', () => console.log(`Built .css at ${ new Date().toTimeString() }`))
+    ;
+  });
+});
+
+
+/*
+ * Static files
+ */
+
+gulp.task('build:static-files', function() {
+  return gulp.src(STATIC_FILE_PATTERNS)
     .pipe(gulp.dest(PUBLIC_DIST_ROOT))
   ;
 });
 
+// Notice: gulp can not observe new files
+gulp.task('watch:static-files', function() {
+  gulp.watch(STATIC_FILE_PATTERNS, function() {
+    return gulp.src(STATIC_FILE_PATTERNS)
+      .on('error', handleErrorAsWarning)
+      .pipe(gulp.dest(PUBLIC_DIST_ROOT))
+      // TODO: Output this message for each file
+      .on('data', () => console.log(`Built static files at ${ new Date().toTimeString() }`))
+    ;
+  });
+});
+
+
+/*
+ * Others
+ */
+
 gulp.task('build:data-uri-images', function() {
-  return gulp.src(path.join(PUBLIC_DIST_ROOT, 'images/**/*.png'))
+  return gulp.src(DATA_URI_IMAGE_PATTERNS)
     .pipe(gulpImageDataURI({
       template: {
-        file: path.join(ROOT, 'gulp-image-data-uri-template.css')
+        file: path.join(ROOT, 'gulp-image-data-uri-template.css'),
       }
     }))
     .pipe(gulpConcat('data-uri-images.css'))
     .pipe(gulp.dest(PUBLIC_DIST_ROOT))
   ;
-});
-
-gulp.task('build:assets', function() {
-  runSequence(['build:css', 'build:images'], 'build:data-uri-images');
 });
 
 gulp.task('build:any-shell-scripts', gulpShell.task([
@@ -182,46 +232,23 @@ gulp.task('build:any-shell-scripts', gulpShell.task([
   //'sh ./scripts/run-failed-task.sh'
 ]));
 
-gulp.task('watch:assets', function() {
-
-  // css
-  gulp.watch([STYLES_FILE_PATH], function() {
-    return createCssBundler({ onError: handleErrorAsWarning })
-      .pipe(browserSync.stream({ once: true }))
-      .on('data', function() {
-        console.log('Build stylesheets at ' + new Date().toTimeString());
-      })
-    ;
-  });
-
-  // images
-  // Note: This task is almost useless, because gulp can not observe new files
-  gulp.watch([IMAGES_FILE_PATH], function() {
-    return gulp.src(IMAGES_FILE_PATH)
-      .on('error', handleErrorAsWarning)
-      .pipe(gulp.dest(PUBLIC_DIST_ROOT))
-      .on('data', function() {
-        console.log('Build images at ' + new Date().toTimeString());
-      })
-    ;
-  });
-});
-
-
-//
-// Others
-//
-
 gulp.task('serve', function() {
-  browserSync.init({
+  browserSyncInstance.init({
     server: {
-      baseDir: PUBLIC_ROOT
+      baseDir: PUBLIC_ROOT,
     },
-    notify: false
+    notify: false,
   });
 });
 
-gulp.task('build', ['build:js', 'build:assets', 'build:any-shell-scripts']);
+
+/*
+ * APIs
+ */
+
+gulp.task('build', [
+  'build:js', 'build:css', 'build:static-files', 'build:data-uri-images', 'build:any-shell-scripts'
+]);
 gulp.task('develop', function() {
-  runSequence('build', ['watch:js', 'watch:assets'], 'serve');
+  runSequence('build', ['watch:js', 'watch:css', 'watch:static-files'], 'serve');
 });
