@@ -73,6 +73,7 @@ const createBabelTransformer = () => {
 const createJsSourcesBundler = (indexFilePath, options) => {
   options = Object.assign({
     transformer: createBabelTransformer(),
+    isLicensified: false,
     isWatchfied: false,
   }, options || {});
 
@@ -99,6 +100,10 @@ const createJsSourcesBundler = (indexFilePath, options) => {
     bundler.transform(options.transformer);
   }
 
+  if (options.isLicensified) {
+    bundler.plugin(licensify);
+  }
+
   if (options.isWatchfied) {
     bundler = watchify(bundler);
   }
@@ -123,6 +128,14 @@ const bundleJsSources = (bundler, options) => {
 gulp.task('build:js', function() {
   const bundler = createJsSourcesBundler(JS_SOURCE_INDEX_FILE_PATH);
   return bundleJsSources(bundler);
+});
+
+gulp.task('build:js:production', function() {
+  const bundler = createJsSourcesBundler(JS_SOURCE_INDEX_FILE_PATH, {
+    debug: false,
+    isLicensified: true,
+  });
+  return bundleJsSources(bundler, { outputFileName: 'app.min.js' });
 });
 
 gulp.task('watch:js', function() {
