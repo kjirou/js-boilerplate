@@ -15,7 +15,7 @@ const licensify = require('licensify');
 const notifier = require('node-notifier');
 const path = require('path');
 const postcssCustomProperties = require('postcss-custom-properties');
-const postcssconst = require('postcss-import');
+const postcssImport = require('postcss-import');
 const postcssNested = require('postcss-nested');
 const postcssScss = require('postcss-scss');
 const runSequence = require('run-sequence');
@@ -33,6 +33,9 @@ const CSS_SOURCE_PATTERN = path.join(SOURCE_ROOT, '**/*.scss');
 const STATIC_FILE_PATTERNS = [
   path.join(SOURCE_ROOT, '**/*.{gif,jpg,png}'),
   path.join(SOURCE_ROOT, '**/*.{json,txt}'),
+];
+const DATA_URI_IMAGE_PATTERNS = [
+  path.join(SOURCE_ROOT, 'images/*.png'),
 ];
 
 const browserSyncInstance = browserSync.create();
@@ -207,22 +210,20 @@ gulp.task('watch:static-files', function() {
 });
 
 
-
+/*
+ * Others
+ */
 
 gulp.task('build:data-uri-images', function() {
-  return gulp.src(path.join(PUBLIC_DIST_ROOT, 'images/**/*.png'))
+  return gulp.src(DATA_URI_IMAGE_PATTERNS)
     .pipe(gulpImageDataURI({
       template: {
-        file: path.join(ROOT, 'gulp-image-data-uri-template.css')
+        file: path.join(ROOT, 'gulp-image-data-uri-template.css'),
       }
     }))
     .pipe(gulpConcat('data-uri-images.css'))
     .pipe(gulp.dest(PUBLIC_DIST_ROOT))
   ;
-});
-
-gulp.task('build:assets', function() {
-  runSequence(['build:css', 'build:images'], 'build:data-uri-images');
 });
 
 gulp.task('build:any-shell-scripts', gulpShell.task([
@@ -231,20 +232,23 @@ gulp.task('build:any-shell-scripts', gulpShell.task([
   //'sh ./scripts/run-failed-task.sh'
 ]));
 
-//
-// Others
-//
-
 gulp.task('serve', function() {
   browserSyncInstance.init({
     server: {
-      baseDir: PUBLIC_ROOT
+      baseDir: PUBLIC_ROOT,
     },
-    notify: false
+    notify: false,
   });
 });
 
-gulp.task('build', ['build:js', 'build:assets', 'build:any-shell-scripts']);
+
+/*
+ * APIs
+ */
+
+gulp.task('build', [
+  'build:js', 'build:css', 'build:static-files', 'build:data-uri-images', 'build:any-shell-scripts'
+]);
 gulp.task('develop', function() {
-  runSequence('build', ['watch:js', 'watch:assets'], 'serve');
+  runSequence('build', ['watch:js', 'watch:css', 'watch:static-files'], 'serve');
 });
