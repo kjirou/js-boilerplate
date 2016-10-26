@@ -1,23 +1,19 @@
 'use strict';
 
-const autoprefixer = require('autoprefixer');
 const babelify = require('babelify');
 const browserSync = require('browser-sync');
 const browserify = require('browserify');
 const fs = require('fs');
 const gulp = require('gulp');
+//const gulpAutoprefixer = require('autoprefixer');
 const gulpConcat = require('gulp-concat');
 const gulpImageDataURI = require('gulp-image-data-uri');
-const gulpPostcss = require('gulp-postcss');
 const gulpRename = require('gulp-rename');
+const gulpSass = require('gulp-sass');
 const gulpShell = require('gulp-shell');
 const licensify = require('licensify');
 const notifier = require('node-notifier');
 const path = require('path');
-const postcssCustomProperties = require('postcss-custom-properties');
-const postcssImport = require('postcss-import');
-const postcssNested = require('postcss-nested');
-const postcssScss = require('postcss-scss');
 const runSequence = require('run-sequence');
 const vinylSourceStream  = require('vinyl-source-stream');
 const watchify = require('watchify');
@@ -28,8 +24,10 @@ const SOURCE_ROOT = path.join(ROOT, 'src');
 const PUBLIC_ROOT = path.join(ROOT, 'public');
 const PUBLIC_DIST_ROOT = path.join(PUBLIC_ROOT, 'dist');
 const JS_SOURCE_INDEX_FILE_PATH = path.join(SOURCE_ROOT, 'index.js');
-const CSS_SOURCE_INDEX_FILE_PATH = path.join(SOURCE_ROOT, 'styles/index.scss');
-const CSS_SOURCE_PATTERN = path.join(SOURCE_ROOT, '**/*.scss');
+const CSS_SOURCE_INDEX_FILE_PATH = path.join(SOURCE_ROOT, 'styles/index.sass');
+const CSS_SOURCE_PATTERNS = [
+  path.join(SOURCE_ROOT, '**/*.sass'),
+];
 const STATIC_FILE_PATTERNS = [
   path.join(SOURCE_ROOT, '**/*.{gif,jpg,png}'),
   path.join(SOURCE_ROOT, '**/*.{json,txt}'),
@@ -157,30 +155,25 @@ gulp.task('watch:js', function() {
  * .css builders
  */
 
-const createPostcssTransformer = () => {
-  return gulpPostcss(
-    [
-      postcssImport(),
-      postcssCustomProperties(),
-      postcssNested(),
-      autoprefixer(),
-    ],
-    {
-      syntax: postcssScss
-    }
-  );
-};
-
 const bundleCssSources = (indexFilePath, options) => {
   options = Object.assign({
-    transformer: createPostcssTransformer(),
     errorHandler: function(err) { throw err; },
     outputFileName: 'app.css',
   }, options || {});
 
   return gulp.src(indexFilePath)
-    .pipe(options.transformer)
-    .on('error', options.errorHandler)
+    .pipe(
+      gulpSass({
+        includePaths: [ path.join(ROOT, 'node_modules/sanitize.css/lib') ],
+      })
+      .on('error', options.errorHandler)
+    )
+    // TODO: gulp-autoprefixer is not working now
+    //.pipe(
+    //  gulpAutoprefixer({
+    //    browsers: ['last 2 versions'],
+    //  })
+    //)
     .pipe(gulpRename(options.outputFileName))
     .pipe(gulp.dest(PUBLIC_DIST_ROOT))
   ;
@@ -191,7 +184,7 @@ gulp.task('build:css', function() {
 });
 
 gulp.task('watch:css', function() {
-  gulp.watch([CSS_SOURCE_PATTERN], function() {
+  gulp.watch(CSS_SOURCE_PATTERNS, function() {
     return bundleCssSources(CSS_SOURCE_INDEX_FILE_PATH, { errorHandler: handleErrorAsWarning })
       .pipe(browserSyncInstance.stream({ once: true }))
       .on('data', () => console.log(`Built .css at ${ new Date().toTimeString() }`))
@@ -255,8 +248,8 @@ gulp.task('serve', function() {
 });
 
 
-/*
- * APIs
+/**
+ * Public APIs
  */
 
 gulp.task('build', [
