@@ -7,8 +7,8 @@
     "url": "https://github.com/kjirou/js-boilerplate/issues"
   },
   "dependencies": {
-    "react": "15.0.2",
-    "react-dom": "15.0.2"
+    "react": "15.3.2",
+    "react-dom": "15.3.2"
   },
   "devDependencies": {
     "autoprefixer": "6.5.1",
