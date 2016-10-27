@@ -36,7 +36,6 @@
     "rimraf": "2.5.4",
     "run-sequence": "1.2.2",
     "sanitize.css": "4.1.0",
-    "selenium-webdriver": "2.53.2",
     "vinyl-source-stream": "1.1.0",
     "watchify": "3.7.0"
   },
