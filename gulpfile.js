@@ -1,13 +1,14 @@
 'use strict';
 
+const autoprefixer = require('autoprefixer');
 const babelify = require('babelify');
 const browserSync = require('browser-sync');
 const browserify = require('browserify');
 const fs = require('fs');
 const gulp = require('gulp');
-//const gulpAutoprefixer = require('autoprefixer');
 const gulpConcat = require('gulp-concat');
 const gulpImageDataURI = require('gulp-image-data-uri');
+const gulpPostcss = require('gulp-postcss');
 const gulpRename = require('gulp-rename');
 const gulpSass = require('gulp-sass');
 const gulpShell = require('gulp-shell');
@@ -168,12 +169,13 @@ const bundleCssSources = (indexFilePath, options) => {
       })
       .on('error', options.errorHandler)
     )
-    // TODO: gulp-autoprefixer is not working now
-    //.pipe(
-    //  gulpAutoprefixer({
-    //    browsers: ['last 2 versions'],
-    //  })
-    //)
+    .pipe(
+      gulpPostcss([
+        autoprefixer({
+          browsers: ['last 2 versions'],
+        }),
+      ])
+    )
     .pipe(gulpRename(options.outputFileName))
     .pipe(gulp.dest(PUBLIC_DIST_ROOT))
   ;
