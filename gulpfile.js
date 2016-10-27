@@ -165,7 +165,7 @@ const bundleCssSources = (indexFilePath, options) => {
   return gulp.src(indexFilePath)
     .pipe(
       gulpSass({
-        includePaths: [ path.join(ROOT, 'node_modules/sanitize.css/lib') ],
+        includePaths: [ path.join(ROOT, 'node_modules/sanitize.css') ],
       })
       .on('error', options.errorHandler)
     )
