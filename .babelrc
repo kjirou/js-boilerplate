@@ -4,6 +4,7 @@
     "react"
   ],
   "plugins": [
-    "babel-plugin-espower"
+    "babel-plugin-espower",
+    "babel-plugin-transform-es2015-modules-commonjs"
   ]
 }
